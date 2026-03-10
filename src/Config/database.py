@@ -1,6 +1,6 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
-from src.Models.user_model import User
+from Models.user_model import User
 from dotenv import load_dotenv
 import os
 

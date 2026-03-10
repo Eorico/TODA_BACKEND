@@ -1,7 +1,8 @@
-from src.Models.user_model import User
-from src.Utils.password import Hash_password, verify_password
-from src.Utils.jwt_handler import create_token
+from Models.user_model import User
+from Utils.password import hash_password, verify_password
+from Utils.jwt_handler import create_token
 from fastapi import  HTTPException
+import secrets
 
 
 async def signup(data):
@@ -14,13 +15,13 @@ async def signup(data):
     user = User(
         name=data.name,
         email=data.email,
-        password=Hash_password(data.password),
+        password=hash_password(data.password),
         role=data.role
     )
 
     await user.insert()
 
-    return {"messange": "User created successfully"}
+    return {"message": "User created successfully"}
 
 
 async def login(data):
@@ -41,4 +42,21 @@ async def login(data):
     return {
         "access_token": token,
         "role": user.role
+    }
+
+async def forgot_password(data):
+    user = await User.find_one(User.email == data.email)
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="Email not found")
+    
+    token = secrets.token_hex(16)
+    
+    user.reset_token = token
+    
+    await user.save()
+    
+    return {
+        "message": "Password reset token granted",
+        "reset_token": token
     }
