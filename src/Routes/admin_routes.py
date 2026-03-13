@@ -37,7 +37,7 @@ async def admin_login(data: LoginSchema = Body(...)):
     
 # admin create announcement
 @router.post("/announcements")
-async def create_announcement(data: dict, user=Depends(verify_role("admin"))):
+async def create_announcement(data: dict):
     announcement = Announcement(**data)
     
     await announcement.insert()
@@ -46,14 +46,14 @@ async def create_announcement(data: dict, user=Depends(verify_role("admin"))):
 
 # admin get announcements
 @router.get("/announcements")
-async def get_announcements(user=Depends(verify_role("admin"))):
+async def get_announcements():
     announcements = await Announcement.find_all().to_list()
     
     return announcements
 
 #admin create officer
 @router.post("/officer")
-async def create_officer(data: dict, user=Depends(verify_role("admin"))):
+async def create_officer(data: dict):
     officer = Officer(**data)
     
     await officer.insert()
@@ -62,7 +62,7 @@ async def create_officer(data: dict, user=Depends(verify_role("admin"))):
 
 # admin get officer
 @router.get("/officers")
-async def get_officers(user=Depends(verify_role("admin"))):
+async def get_officers():
     officer = await Officer.find_all().to_list()
     
     await officer.insert()
@@ -71,7 +71,7 @@ async def get_officers(user=Depends(verify_role("admin"))):
 
 # delete admin officer
 @router.delete("/officer/{id}")
-async def delete_officer(id: str, user=Depends(verify_role("admin"))):
+async def delete_officer(id: str):
     officer = await Officer.get(id)
     
     await officer.delete()

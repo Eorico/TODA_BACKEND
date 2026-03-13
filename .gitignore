@@ -1,2 +1,7 @@
 .env
 secret_keys.txt
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
