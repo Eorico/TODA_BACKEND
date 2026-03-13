@@ -1,6 +1,6 @@
-from src.Models.user_model import User
-from src.Utils.password import hash_password, verify_password
-from src.Utils.jwt_handler import create_token
+from Models.user_model import User
+from Utils.password import hash_password, verify_password
+from Utils.jwt_handler import create_token
 from fastapi import HTTPException
 import secrets
 

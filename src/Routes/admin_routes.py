@@ -53,7 +53,7 @@ async def get_announcements(user=Depends(verify_role("admin"))):
 
 #admin create officer
 @router.post("/officer")
-async def create_officer(data: dict, user=Depends(verify_role["admin"])):
+async def create_officer(data: dict, user=Depends(verify_role("admin"))):
     officer = Officer(**data)
     
     await officer.insert()
@@ -62,7 +62,7 @@ async def create_officer(data: dict, user=Depends(verify_role["admin"])):
 
 # admin get officer
 @router.get("/officers")
-async def get_officers(user=Depends(verify_role["admin"])):
+async def get_officers(user=Depends(verify_role("admin"))):
     officer = await Officer.find_all().to_list()
     
     await officer.insert()
