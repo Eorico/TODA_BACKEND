@@ -1,6 +1,6 @@
- from beanie import Document
+from beanie import Document
  
- class CodingSchedule(Document):
+class CodingSchedule(Document):
     plate_last_digit: int
     day: str
 
