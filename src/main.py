@@ -15,6 +15,7 @@ app.include_router(admin_router, prefix="/admin", tags=["Admin"])
 @app.on_event("startup")
 async def start_database():
     await init_database()
+    print("TODA BACKEND is running on http://127.0.0.1:8000 (Press CTRL+C to quit)")
     
 @app.get("/")
 async def root():
