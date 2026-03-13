@@ -15,6 +15,7 @@ class User(Document):
     email: EmailStr
     password: str
     role: str
+    is_active: bool = True
     reset_token: Optional[str] = None
     created_at: datetime = datetime.utcnow()
     
