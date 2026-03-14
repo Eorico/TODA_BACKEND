@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, optional
 
 """
     SCHEMA CONNECTION TO DATABASE
@@ -16,3 +16,8 @@ class LoginSchema(BaseModel):
     
 class ForgotPasswordSchema(BaseModel):
     email: EmailStr
+
+class RiderProfileCreateSchema(BaseModel):
+    address: str
+    license_pic: optional[str] = None 
+    tricycle_body_number: str
