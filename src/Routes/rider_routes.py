@@ -10,7 +10,7 @@ from Models.announcement_model import Announcement
 router = APIRouter(
     prefix="/rider",
     tags=["Rider"],
-    dependencies=[Depends(verify_role["rider"])]
+    dependencies=[Depends(verify_role("rider"))]
 )
 
 @router.get("/rider-dashboard")
