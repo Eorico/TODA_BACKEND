@@ -1,9 +1,11 @@
-from Models.rider_profile_model import RiderProfile
+from Models.riderprofile_model import RiderProfile
+from Schemas.user_schema import RiderProfileCreateSchema
+from fastapi import HTTPException
 
 async def  create_rider_profile(user, data: RiderProfileCreateSchema):
-    existing = awaits RidersProfile.find_one(RiderProfile.user.id == user.id)
+    existing = await RiderProfile.find_one(RiderProfile.user.id == user.id)
     if existing:
-        raise HTTPExeption(status_code_400, detail=" Rider profile already exists")
+        raise HTTPException(status_code=400, detail=" Rider profile already exists")
 
     profile = RiderProfile(
         user=user,
@@ -18,13 +20,13 @@ async def  create_rider_profile(user, data: RiderProfileCreateSchema):
 async def get_rider_profile(user):
     profile = await RiderProfile.find_one(RiderProfile.user.id == user.id)
     if not profile:
-        raise HTTPExeption(status_code_404, detail="Profile not found")
+        raise HTTPException(status_code=404, detail="Profile not found")
     return profile
 
-async def get _rider_funds(user):
+async def get_rider_funds(user):
     total_fund = 0 
     return {"funds": total_fund}
 
-async def get is_rider_approved(user):
+async def is_rider_approved(user):
     profile = await RiderProfile.find_one(RiderProfile.user.id == user.id)
-    riderprofile.user.id 
+    return profile.is_approved if profile else False
