@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
+from pydantic import BaseModel
 
 """
     SCHEMA CONNECTION TO DATABASE
@@ -22,3 +23,7 @@ class RiderProfileCreateSchema(BaseModel):
     address: str
     license_pic: Optional[str] = None 
     tricycle_body_number: str
+
+class CommentCreateSchema(BaseModel)
+    announcement_id: str
+    message: str
