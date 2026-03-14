@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Body, HTTPException
 from Middleware.role_base_access import verify_role
 from Models.announcement_model import Announcement
 from Models.officer_model import Officer
-from Schemas.user_schema import LoginSchema
+from backend.src.Schemas.shemas import LoginSchema
 from Services.auth_service import login
 
 # routes of admin

@@ -1,5 +1,5 @@
 from Models.riderprofile_model import RiderProfile
-from Schemas.user_schema import RiderProfileCreateSchema
+from backend.src.Schemas.shemas import RiderProfileCreateSchema
 from fastapi import HTTPException
 
 async def  create_rider_profile(user, data: RiderProfileCreateSchema):
