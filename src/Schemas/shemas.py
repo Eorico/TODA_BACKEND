@@ -24,6 +24,6 @@ class RiderProfileCreateSchema(BaseModel):
     license_pic: Optional[str] = None 
     tricycle_body_number: str
 
-class CommentCreateSchema(BaseModel)
+class CommentCreateSchema(BaseModel):
     announcement_id: str
     message: str
