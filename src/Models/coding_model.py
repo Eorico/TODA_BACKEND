@@ -1,8 +1,9 @@
 from beanie import Document
  
 class CodingSchedule(Document):
-    plate_last_digit: int
+    date: str
     day: str
+    last_digit: int
 
     class Settings:
-        name = "Coding_schedule"
+        name = "coding_schedule"

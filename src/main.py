@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from Routes.auth_routes import router as auth_router
 from Routes.admin_routes import router as admin_router
+from Routes.admin_routes import public_router as admin_router_public
 from Routes.rider_routes import router as rider_router
 from Routes.passenger_routes import router as passenger_router
 from Routes.comment_routes import router as comment_router
@@ -15,6 +16,7 @@ app = FastAPI(
 
 app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
 app.include_router(admin_router, prefix="/admin", tags=["Admin"])
+app.include_router(admin_router_public, prefix="/admin", tags=["Admin"])
 app.include_router(rider_router, prefix="/rider", tags=["Rider"])
 app.include_router(passenger_router, prefix="/passenger", tags=["Passenger"])
 

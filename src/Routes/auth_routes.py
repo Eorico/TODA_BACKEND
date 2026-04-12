@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from Schemas.shemas import SignUpSchema, LoginSchema, ForgotPasswordSchema
+from backend.src.Schemas.auth_schema import SignUpSchema, LoginSchema, ForgotPasswordSchema
 from Controllers.auth_controller import *
 
 router = APIRouter()
