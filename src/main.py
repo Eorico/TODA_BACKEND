@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from Routes.auth_routes import router as auth_router
 from Routes.admin_routes import router as admin_router
 from Routes.admin_routes import public_router as admin_router_public
@@ -12,6 +13,16 @@ app = FastAPI(
     title="TODA BACKEND",
     description="Backend API for Riders, Passengers, and Admin",
     version="1.0.0"
+)
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
