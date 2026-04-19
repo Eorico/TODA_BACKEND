@@ -1,9 +1,13 @@
 from beanie import Document
+from typing import Optional
  
 class CodingSchedule(Document):
-    date: str
     day: str
-    last_digit: int
+    bodyRange: str
+    time: str
+    status: str
+    route: str
+    effectivity: Optional[str] = None
 
     class Settings:
         name = "coding_schedule"

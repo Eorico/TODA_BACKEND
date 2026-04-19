@@ -1,4 +1,5 @@
 .env
+src/create_admin.py
 secret_keys.txt
 # Python cache files
 __pycache__/

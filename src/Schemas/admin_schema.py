@@ -8,42 +8,57 @@ class CommentCreateSchema(BaseModel):
     message: str
     
 class AnnouncementSchema(BaseModel):
+    type: str = "General" 
     title: str
-    description: str
+    body: str
+    author: str = "Admin"
     
 class OfficerSchema(BaseModel):
-    first_name: str
-    middle_name: str
-    last_name: str
-    officer_id: str
+    fname: str
+    mi: Optional[str] = ""
+    lname: str
     role: str
-    duty_status: str
+    status: str
     phone: str
-    email: EmailStr
+    email: str
+    custom_id: str
     
 class ContributionSchema(BaseModel):
-    first_name: str
-    last_name: str
-    body_number: str
-    driver_id: str
+    fname: str
+    lname: str
+    body: str
+    driverid: str
     amount: float
-    period_date: str
-    date_paid: str
-    payment_status: str
+    period: str
+    date: str
+    status: str
     notes: Optional[str] = None
     
 class LostFoundSchema(BaseModel):
-    item_name: str
-    image_url: str
-    body_number: str
-    date_found: str
+    name: str
+    body: str
+    date: str         
+    status: str = "Pending"
+    image: Optional[str] = None 
     
 class FareSchema(BaseModel):
-    base_fare: float
-    town_proper: float
-    special_trip: float
+    base: float
+    highway: float  
+    special: float
+    discStudent: float
+    discSenior: float
     
 class CodingSchema(BaseModel):
-    date: str
     day: str
-    last_digit: int
+    bodyRange: str
+    time: str
+    status: str
+    route: str
+    effectivity: Optional[str] = None
+    
+class MemberRosterSchema(BaseModel):
+    name: str
+    id: str
+    status: str
+    contrib: str
+    date: str

@@ -6,16 +6,17 @@ from Models.riderprofile_model import RiderProfile
 from Models.lostfound_model import LostFound
 from Models.fare_matrix_model import Fare
 from Models.coding_model import CodingSchedule
+from Models.roster_model import MemberRoster
+from Models.contribution_or_butaw_model import Contribution_Or_Butaw
 from Schemas.auth_schema import LoginSchema
 from Schemas.rider_schema import RiderProfileCreateSchema
 from Schemas.admin_schema import (
     AnnouncementSchema, LostFoundSchema, FareSchema,
-    CodingSchema, OfficerSchema
+    CodingSchema, OfficerSchema, ContributionSchema, MemberRosterSchema
 )
 from Services.auth_service import login
 
 public_router = APIRouter(
-    prefix="/admin",
     tags=["Admin"]
 )
 
@@ -33,51 +34,120 @@ async def admin_login(data: LoginSchema = Body(...)):
     }
 
 router = APIRouter(
-    prefix="/admin",
     tags=["Admin"],
     dependencies=[Depends(verify_role("admin"))]
 )
 
+def serialize(doc):
+    return {**doc.model_dump(), "id": str(doc.id)}
 
 @router.get("/dashboard")
 async def admin_dashboard():
     return {"message": "Welcome Admin",}
     
-@router.put("/riders/{id}")
+@router.post("/riders")
+async def create_rider(data: RiderProfileCreateSchema):
+    new_rider = RiderProfile(**data.dict())
+    await new_rider.insert()
+    return {"message": "Rider added"}
+
+@router.get("/riders")
+async def get_all_riders():
+    riders = await RiderProfile.find_all().to_list()
+    return [serialize(r) for r in riders]
+
+@router.put("/riders/approve/{id}")  # ✅ specific route FIRST
+async def approve_rider(id: str):
+    rider = await RiderProfile.get(id)
+    if not rider:
+        return {"message": "Rider not found"}
+    rider.member_status = "approved"
+    rider.status = "active"
+    await rider.save()
+    return {"message": "Rider approved"}
+
+@router.put("/riders/{id}")          # ✅ dynamic route AFTER
 async def update_rider(id: str, data: RiderProfileCreateSchema):
     rider = await RiderProfile.get(id)
     if not rider:
         return {"message": "Rider not found"}
-
-    for key, value in data.dict(exlcude_unset=True).items():
+    for key, value in data.dict(exclude_unset=True).items():
         setattr(rider, key, value)
-
     await rider.save()
     return {"message": "Rider updated"}
-
-@router.put("/riders/approve/{id}")
-async def approve_rider(id: str):
-    rider = await RiderProfile.get(id)
-
-    if not rider:
-        return {"message": "Rider not found"}
-
-    rider.member_status = "approved"
-    rider.account_status = "active"
-
-    await rider.save()
-
-    return {"message": "Rider approved"}
 
 @router.delete("/riders/{id}")
 async def delete_rider(id: str):
     rider = await RiderProfile.get(id)
-
     if not rider:
         return {"message": "Rider not found"}
-
     await rider.delete()
     return {"message": "Rider deleted"}
+
+@router.get("/roster")
+async def get_roster():
+    members = await MemberRoster.find_all().to_list()
+    return [serialize(m) for m in members]
+
+@router.post("/roster")
+async def create_member(data: MemberRosterSchema):
+    new_member = MemberRoster(**data.dict())
+    await new_member.insert()
+    return {"message": "Member added to roster"}
+
+@router.put("/roster/{id}")
+async def update_member(id: str, data: MemberRosterSchema):
+    member = await MemberRoster.get(id)
+    if not member:
+        return {"message": "Member not found"}
+
+    # Dynamically update based on the schema payload (name, status, contrib, etc.)
+    for key, value in data.dict(exclude_unset=True).items():
+        setattr(member, key, value)
+
+    await member.save()
+    return {"message": "Member record updated"}
+
+@router.delete("/roster/{id}")
+async def delete_member(id: str):
+    member = await MemberRoster.get(id)
+    if not member:
+        return {"message": "Member not found"}
+    
+    await member.delete()
+    return {"message": "Member removed from roster"}
+
+@router.post("/contributions")
+async def create_contribution(data: ContributionSchema):
+    new_record = Contribution_Or_Butaw(**data.dict())
+    await new_record.insert()
+    return {"message": "Contribution recorded successfully"}
+
+@router.get("/contributions")
+async def get_all_contributions():
+    records = await Contribution_Or_Butaw.find_all().to_list()
+    return [serialize(r) for r in records]
+
+@router.put("/contributions/{id}")
+async def update_contribution(id: str, data: ContributionSchema):
+    record = await Contribution_Or_Butaw.get(id)
+    if not record:
+        return {"message": "Contribution or Butaw not found"}
+    
+    for key, value in data.dict(exclude_unset=True).items():
+        setattr(record, key, value)
+    
+    await record.save()
+    return {"message": "Record updated"}
+
+@router.delete("/contributions/{id}")
+async def delete_contribution(id: str):
+    record = await Contribution_Or_Butaw.get(id)
+    if not record:
+        return {"message": "Record not found"}
+    
+    await record.delete()
+    return {"message": "Record deleted"}
 
 @router.post("/announcements")
 async def create_announcement(data: AnnouncementSchema):
@@ -89,7 +159,7 @@ async def create_announcement(data: AnnouncementSchema):
 @router.get("/announcements")
 async def get_announcements():
     announcements = await Announcement.find_all().to_list()
-    return announcements
+    return [serialize(a) for a in announcements]
 
 @router.put("/announcements/{id}")
 async def update_announcement(id: str, data: AnnouncementSchema):
@@ -98,7 +168,7 @@ async def update_announcement(id: str, data: AnnouncementSchema):
     if not announcement:
         return {"message": "Announcement not found"}
 
-    for k, v in data.dict(exlcude_unset=True).items():
+    for k, v in data.dict(exclude_unset=True).items():
         setattr(announcement, k, v)
 
     await announcement.save()
@@ -122,7 +192,8 @@ async def create_lost_found(data: LostFoundSchema):
 
 @router.get("/lost-found")
 async def get_lost_found():
-    return await LostFound.find_all().to_list()
+    items = await LostFound.find_all().to_list()
+    return [serialize(i) for i in items]
 
 @router.put("/lost-found/{id}")
 async def update_lost_found(id: str, data: LostFoundSchema):
@@ -131,7 +202,7 @@ async def update_lost_found(id: str, data: LostFoundSchema):
     if not item:
         return {"message": "Item not found"}
 
-    for k, v in data.dict(exlcude_unset=True).items():
+    for k, v in data.dict(exclude_unset=True).items():
         setattr(item, k, v)
 
     await item.save()
@@ -164,7 +235,7 @@ async def update_fare(id: str, data: FareSchema):
     if not fare:
         return {"message": "Fare not found"}
 
-    for k, v in data.dict(exlcude_unset=True).items():
+    for k, v in data.dict(exclude_unset=True).items():
         setattr(fare, k, v)
 
     await fare.save()
@@ -188,7 +259,8 @@ async def add_coding(data: CodingSchema):
 
 @router.get("/coding")
 async def get_coding():
-    return await CodingSchedule.find_all().to_list()
+    items = await CodingSchedule.find_all().to_list()
+    return [serialize(c) for c in items]
 
 @router.put("/coding/{id}")
 async def update_coding(id: str, data: CodingSchema):
@@ -197,7 +269,7 @@ async def update_coding(id: str, data: CodingSchema):
     if not coding:
         return {"message": "Coding not found"}
 
-    for k, v in data.dict(exlcude_unset=True).items():
+    for k, v in data.dict(exclude_unset=True).items():
         setattr(coding, k, v)
 
     await coding.save()
@@ -222,7 +294,7 @@ async def create_officer(data: OfficerSchema):
 @router.get("/officers")
 async def get_officers():
     officers = await Officer.find_all().to_list()
-    return officers
+    return [serialize(o) for o in officers]
 
 @router.put("/officers/{id}")
 async def update_officer(id: str, data: OfficerSchema):
@@ -231,7 +303,7 @@ async def update_officer(id: str, data: OfficerSchema):
     if not officer:
         return {"message": "Officer not found"}
 
-    for k, v in data.dict(exlcude_unset=True).items():
+    for k, v in data.dict(exclude_unset=True).items():
         setattr(officer, k, v)
 
     await officer.save()

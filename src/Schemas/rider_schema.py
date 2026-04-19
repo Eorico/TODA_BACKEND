@@ -1,8 +1,12 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Optional 
 from pydantic import BaseModel
 
 class RiderProfileCreateSchema(BaseModel):
-    address: str = Field(..., min_length=5)
-    license_pic: Optional[str] = None 
-    tricycle_body_number: str = Field(..., min_length=1)
+    fname: str
+    lname: str
+    body: str
+    contact: str
+    status: str
+    address: Optional[str] = "Not Specified"
+    member_status: Optional[str] = "approved"

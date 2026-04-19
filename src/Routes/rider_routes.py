@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from Middleware.role_base_access import verify_role
-from backend.src.Schemas.rider_schema import RiderProfileCreateSchema
+from Schemas.rider_schema import RiderProfileCreateSchema
 from Models.lostfound_model import LostFound
 from Services.rider_profile_service import (
     create_rider_profile, get_rider_profile, 

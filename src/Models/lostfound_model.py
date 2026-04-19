@@ -1,12 +1,16 @@
 from beanie import Document
-from datetime import datetime
+from datetime import datetime, timezone
+from typing import Optional
+from pydantic import Field
 
 class LostFound(Document):
 
-    item_name: str
-    image_url: str
-    tricycle_body_number: str
-    date_found: datetime
-
+    name: str
+    body: str
+    date: str         
+    status: str = "Pending"
+    image: Optional[str] = None  
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    
     class Settings:
         name = "lost_found"

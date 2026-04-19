@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends
-from backend.src.Schemas.admin_schema import CommentCreateSchema 
+from Schemas.admin_schema import CommentCreateSchema 
 from Services.comment_service import  create_comment, get_comments
 from Middleware.role_base_access import verify_role
 

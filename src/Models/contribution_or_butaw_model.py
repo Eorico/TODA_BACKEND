@@ -1,19 +1,17 @@
 from beanie import Document
-from datetime import datetime
+from typing import Optional
 
 class Contribution_Or_Butaw(Document):
 
-    first_name: str
-    last_name: str
-    tricycle_body_number: str
-    driver_id: str
-    
+    fname: str
+    lname: str
+    body: str
+    driverid: str
     amount: float
-    period_date: str
-    date_paid: str
-    
-    payment_status: str # paid or unpaid
-    notes: str
+    period: str
+    date: str
+    status: str  # paid, partial, or unpaid
+    notes: Optional[str] = None
 
     class Settings:
         name = "contributions_or_butaw"
