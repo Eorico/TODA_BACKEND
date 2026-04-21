@@ -56,6 +56,15 @@ class CodingSchema(BaseModel):
     route: str
     effectivity: Optional[str] = None
     
+class ViolationSchema(BaseModel):
+    driver_id: str       
+    driver_name: str       
+    body: str               
+    date: str             
+    violation: str           
+    penalty: str            
+    penalty_amount: Optional[str] = None  
+    
 class MemberRosterSchema(BaseModel):
     name: str
     id: str

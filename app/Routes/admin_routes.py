@@ -8,11 +8,13 @@ from Models.fare_matrix_model import Fare
 from Models.coding_model import CodingSchedule
 from Models.roster_model import MemberRoster
 from Models.contribution_or_butaw_model import Contribution_Or_Butaw
+from Models.violation_model import Violation
 from Schemas.auth_schema import LoginSchema
 from Schemas.rider_schema import RiderProfileCreateSchema
 from Schemas.admin_schema import (
     AnnouncementSchema, LostFoundSchema, FareSchema,
-    CodingSchema, OfficerSchema, ContributionSchema, MemberRosterSchema
+    CodingSchema, OfficerSchema, ContributionSchema, MemberRosterSchema,
+    ViolationSchema
 )
 from Services.auth_service import login
 
@@ -318,3 +320,39 @@ async def delete_officer(id: str):
 
     await officer.delete()
     return {"message": "Officer removed"}
+
+@router.post("/violations")
+async def create_violation(data: ViolationSchema):
+    violation = Violation(**data.dict())
+    await violation.insert()
+    return {"message": "Violation recorded"}
+
+@router.get("/violations")
+async def get_violations():
+    items = await Violation.find_all().to_list()
+    return [serialize(v) for v in items]
+
+@router.get("/violations/{id}")
+async def get_violation(id: str):
+    item = await Violation.get(id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Violation not found")
+    return serialize(item)
+
+@router.put("/violations/{id}")
+async def update_violation(id: str, data: ViolationSchema):
+    item = await Violation.get(id)
+    if not item:
+        return {"message": "Violation not found"}
+    for k, v in data.dict(exclude_unset=True).items():
+        setattr(item, k, v)
+    await item.save()
+    return {"message": "Violation updated"}
+
+@router.delete("/violations/{id}")
+async def delete_violation(id: str):
+    item = await Violation.get(id)
+    if not item:
+        return {"message": "Violation not found"}
+    await item.delete()
+    return {"message": "Violation deleted"}

@@ -12,6 +12,7 @@ from Models.message_model import Message
 from Models.officer_model import Officer
 from Models.riderprofile_model import RiderProfile
 from Models.roster_model import MemberRoster
+from Models.violation_model import Violation
 from dotenv import load_dotenv
 import os
 
@@ -36,6 +37,7 @@ async def init_database():
             Message,
             Officer,
             RiderProfile,
-            MemberRoster
+            MemberRoster,
+            Violation
         ]
     )
