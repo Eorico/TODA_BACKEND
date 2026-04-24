@@ -3,10 +3,11 @@ from typing import Optional
 from pydantic import BaseModel
 
 class RiderProfileCreateSchema(BaseModel):
-    fname: str
-    lname: str
-    body: str
+    full_name: str
+    last_name: str = ""
+    body_number: str = "---"
     contact: str
-    status: str
+    email: Optional[str] = None    
+    license_url: Optional[str] = None
     address: Optional[str] = "Not Specified"
-    member_status: Optional[str] = "approved"
+    status: Optional[str] = "Active"

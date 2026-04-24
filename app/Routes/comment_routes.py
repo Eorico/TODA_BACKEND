@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
-from Schemas.admin_schema import CommentCreateSchema 
-from Services.comment_service import  create_comment, get_comments
+from Schemas.admin_schema import CommentCreateSchema
+from Controllers.comment_controller import CommentController
 from Middleware.role_base_access import verify_role
 
 router = APIRouter(
@@ -10,12 +10,11 @@ router = APIRouter(
 
 @router.post("/")
 async def comment_on_event(
-    data:CommentCreateSchema,
+    data: CommentCreateSchema,
     user=Depends(verify_role("rider"))
 ):
-    user_id = user["user_id"]
-    return await create_comment(user_id, data)
+    return await CommentController.create(user["user_id"], data)
 
 @router.get("/{announcement_id}")
 async def view_comments(announcement_id: str):
-    return await get_comments(announcement_id)
+    return await CommentController.get_by_announcement(announcement_id)

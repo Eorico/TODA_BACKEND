@@ -5,9 +5,9 @@ from pydantic import Field
 
 class Officer(Document):
 
-    fname: str
+    full_name: Optional[str] = None
     mi: Optional[str] = ""
-    lname: str
+    last_name: Optional[str] = None
     role: str           # President, Vice President, etc.
     status: str         # on-duty, in-office, off-duty
     phone: str

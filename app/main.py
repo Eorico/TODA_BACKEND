@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from Routes.auth_routes import router as auth_router
 from Routes.admin_routes import router as admin_router
@@ -8,6 +9,7 @@ from Routes.passenger_routes import router as passenger_router
 from Routes.comment_routes import router as comment_router
 from Routes.chat_routes import router as chat_router
 from Config.database import init_database
+import os
 
 app = FastAPI(
     title="TODA BACKEND",
@@ -24,6 +26,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
 app.include_router(admin_router, prefix="/admin")

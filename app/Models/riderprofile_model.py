@@ -5,14 +5,15 @@ from Models.user_model import User
 from pydantic import Field
 
 class RiderProfile(Document):
-    # Field names now match your JS payload keys
-    fname: str
-    lname: str
-    body: str
+    full_name: str
+    last_name: str = ""
+    body_number: str = "---"
     contact: str
     status: str = "Active"
     
-    # Keeping your original logic but making it compatible
+    email: Optional[str] = None  
+        
+    license_url: Optional[str] = None 
     address: Optional[str] = "Not Specified"
     user: Optional[Link[User]] = None
     member_status: str = "approved"

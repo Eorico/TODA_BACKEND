@@ -1,12 +1,7 @@
 from fastapi import APIRouter, Depends
 from Middleware.role_base_access import verify_role
 from Schemas.rider_schema import RiderProfileCreateSchema
-from Models.lostfound_model import LostFound
-from Services.rider_profile_service import (
-    create_rider_profile, get_rider_profile, 
-    get_rider_funds, is_rider_approved
-)
-from Models.announcement_model import Announcement
+from Controllers.rider_controller import RiderViewController
 
 router = APIRouter(
     prefix="/rider",
@@ -16,28 +11,24 @@ router = APIRouter(
 
 @router.get("/dashboard")
 async def rider_dashboard():
-    return {"message": "Welcome Rider"}
+    return await RiderViewController.dashboard()
 
 @router.post("/profile")
 async def submit_profile(data: RiderProfileCreateSchema, user=Depends(verify_role("rider"))):
-    return await create_rider_profile(user, data)
+    return await RiderViewController.submit_profile(user, data)
 
 @router.get("/profile")
-async def view_profile(user=Depends()):
-    return await get_rider_profile(user)
+async def view_profile(user=Depends(verify_role("rider"))):
+    return await RiderViewController.view_profile(user)
 
 @router.get("/funds")
-async def view_funds(user=Depends()):
-    return await get_rider_funds(user)
+async def view_funds(user=Depends(verify_role("rider"))):
+    return await RiderViewController.view_funds(user)
 
 @router.get("/lost-found")
 async def view_lost_found():
-    return await LostFound.find_all().to_list()
+    return await RiderViewController.view_lost_found()
 
 @router.get("/announcements")
-async def view_announcements(user=Depends()):
-    if not await is_rider_approved(user):
-        return {"message": "Profile not approved yet"}
-    
-    announcements = await Announcement.find_all().sort("-created_at").to_list()
-    return announcements
+async def view_announcements(user=Depends(verify_role("rider"))):
+    return await RiderViewController.view_announcements(user)

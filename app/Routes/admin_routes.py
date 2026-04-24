@@ -1,14 +1,5 @@
-from fastapi import APIRouter, Depends, Body, HTTPException
+from fastapi import APIRouter, Depends, Body, HTTPException, File, UploadFile
 from Middleware.role_base_access import verify_role
-from Models.announcement_model import Announcement
-from Models.officer_model import Officer
-from Models.riderprofile_model import RiderProfile
-from Models.lostfound_model import LostFound
-from Models.fare_matrix_model import Fare
-from Models.coding_model import CodingSchedule
-from Models.roster_model import MemberRoster
-from Models.contribution_or_butaw_model import Contribution_Or_Butaw
-from Models.violation_model import Violation
 from Schemas.auth_schema import LoginSchema
 from Schemas.rider_schema import RiderProfileCreateSchema
 from Schemas.admin_schema import (
@@ -16,7 +7,16 @@ from Schemas.admin_schema import (
     CodingSchema, OfficerSchema, ContributionSchema, MemberRosterSchema,
     ViolationSchema
 )
-from Services.auth_service import login
+from Services.auth_service import AuthService
+
+from Controllers.admin_controller import (
+    RiderController, RosterController, ContributionController,
+    AnnouncementController, LostFoundController, FareController,
+    CodingController, OfficerController, ViolationController
+)
+from beanie import PydanticObjectId
+from Models.riderprofile_model import RiderProfile
+import base64
 
 public_router = APIRouter(
     tags=["Admin"]
@@ -24,8 +24,7 @@ public_router = APIRouter(
 
 @public_router.post("/login")
 async def admin_login(data: LoginSchema = Body(...)):
-    
-    result = await login(data)
+    result = await AuthService.login(data)   
 
     if result["role"] != "admin":
         raise HTTPException(status_code=403, detail="Access denied: not admin")
@@ -40,319 +39,194 @@ router = APIRouter(
     dependencies=[Depends(verify_role("admin"))]
 )
 
-def serialize(doc):
-    return {**doc.model_dump(), "id": str(doc.id)}
-
 @router.get("/dashboard")
 async def admin_dashboard():
-    return {"message": "Welcome Admin",}
-    
+    return {"message": "Welcome Admin"}
+
+# ── Riders ──────────────────────────────────────────────────────
 @router.post("/riders")
 async def create_rider(data: RiderProfileCreateSchema):
-    new_rider = RiderProfile(**data.dict())
-    await new_rider.insert()
-    return {"message": "Rider added"}
+    return await RiderController.create(data)
+
+@router.post("/riders/{id}/license")
+async def upload_rider_license(id: str, license: UploadFile = File(...)):
+    content = await license.read()
+    
+    base64_encoded = base64.b64encode(content).decode("utf-8")
+    mime_type = license.content_type
+    license_url = f"data:{mime_type};base64,{base64_encoded}"
+    
+    rider = await RiderProfile.get(PydanticObjectId(id))
+    if not rider:
+        raise HTTPException(status_code=404, detail="Rider not found")
+    await rider.set({"license_url": license_url})
+    return {
+        "message": "License processed and store in database successfully",
+        "type": "base64"
+    }
 
 @router.get("/riders")
-async def get_all_riders():
-    riders = await RiderProfile.find_all().to_list()
-    return [serialize(r) for r in riders]
+async def get_riders():
+    return await RiderController.get_all()
 
-@router.put("/riders/approve/{id}")  # ✅ specific route FIRST
+@router.put("/riders/{id}/accept")
 async def approve_rider(id: str):
-    rider = await RiderProfile.get(id)
-    if not rider:
-        return {"message": "Rider not found"}
-    rider.member_status = "approved"
-    rider.status = "active"
-    await rider.save()
-    return {"message": "Rider approved"}
+    return await RiderController.approve(id)
 
-@router.put("/riders/{id}")          # ✅ dynamic route AFTER
+@router.put("/riders/{id}/reject")
+async def reject_rider(id: str):
+    """
+    Handles the rejection of a rider application.
+    """
+    return await RiderController.reject(id)
+
+@router.put("/riders/{id}")
 async def update_rider(id: str, data: RiderProfileCreateSchema):
-    rider = await RiderProfile.get(id)
-    if not rider:
-        return {"message": "Rider not found"}
-    for key, value in data.dict(exclude_unset=True).items():
-        setattr(rider, key, value)
-    await rider.save()
-    return {"message": "Rider updated"}
+    return await RiderController.update(id, data)
 
 @router.delete("/riders/{id}")
 async def delete_rider(id: str):
-    rider = await RiderProfile.get(id)
-    if not rider:
-        return {"message": "Rider not found"}
-    await rider.delete()
-    return {"message": "Rider deleted"}
+    return await RiderController.delete_by_id(id)
 
+
+# ── Roster ───────────────────────────────────────────────────────
 @router.get("/roster")
 async def get_roster():
-    members = await MemberRoster.find_all().to_list()
-    return [serialize(m) for m in members]
+    return await RosterController.get_all()
 
 @router.post("/roster")
 async def create_member(data: MemberRosterSchema):
-    new_member = MemberRoster(**data.dict())
-    await new_member.insert()
-    return {"message": "Member added to roster"}
+    return await RosterController.create(data)
 
 @router.put("/roster/{id}")
 async def update_member(id: str, data: MemberRosterSchema):
-    member = await MemberRoster.get(id)
-    if not member:
-        return {"message": "Member not found"}
-
-    # Dynamically update based on the schema payload (name, status, contrib, etc.)
-    for key, value in data.dict(exclude_unset=True).items():
-        setattr(member, key, value)
-
-    await member.save()
-    return {"message": "Member record updated"}
+    return await RosterController.update(id, data)
 
 @router.delete("/roster/{id}")
 async def delete_member(id: str):
-    member = await MemberRoster.get(id)
-    if not member:
-        return {"message": "Member not found"}
-    
-    await member.delete()
-    return {"message": "Member removed from roster"}
+    return await RosterController.delete_by_id(id)
 
+# ── Contributions ────────────────────────────────────────────────
 @router.post("/contributions")
 async def create_contribution(data: ContributionSchema):
-    new_record = Contribution_Or_Butaw(**data.dict())
-    await new_record.insert()
-    return {"message": "Contribution recorded successfully"}
+    return await ContributionController.create(data)
 
 @router.get("/contributions")
-async def get_all_contributions():
-    records = await Contribution_Or_Butaw.find_all().to_list()
-    return [serialize(r) for r in records]
+async def get_contributions():
+    return await ContributionController.get_all()
 
 @router.put("/contributions/{id}")
 async def update_contribution(id: str, data: ContributionSchema):
-    record = await Contribution_Or_Butaw.get(id)
-    if not record:
-        return {"message": "Contribution or Butaw not found"}
-    
-    for key, value in data.dict(exclude_unset=True).items():
-        setattr(record, key, value)
-    
-    await record.save()
-    return {"message": "Record updated"}
+    return await ContributionController.update(id, data)
 
 @router.delete("/contributions/{id}")
 async def delete_contribution(id: str):
-    record = await Contribution_Or_Butaw.get(id)
-    if not record:
-        return {"message": "Record not found"}
-    
-    await record.delete()
-    return {"message": "Record deleted"}
+    return await ContributionController.delete_by_id(id)
 
+# ── Announcements ────────────────────────────────────────────────
 @router.post("/announcements")
 async def create_announcement(data: AnnouncementSchema):
-    announcement = Announcement(**data.dict())
-    await announcement.insert()
-    return {"message": "Announcement posted!"}
-
+    return await AnnouncementController.create(data)
 
 @router.get("/announcements")
 async def get_announcements():
-    announcements = await Announcement.find_all().to_list()
-    return [serialize(a) for a in announcements]
+    return await AnnouncementController.get_all()
 
 @router.put("/announcements/{id}")
 async def update_announcement(id: str, data: AnnouncementSchema):
-    announcement = await Announcement.get(id)
-
-    if not announcement:
-        return {"message": "Announcement not found"}
-
-    for k, v in data.dict(exclude_unset=True).items():
-        setattr(announcement, k, v)
-
-    await announcement.save()
-    return {"message": "Updated"}
+    return await AnnouncementController.update(id, data)
 
 @router.delete("/announcements/{id}")
 async def delete_announcement(id: str):
-    announcement = await Announcement.get(id)
+    return await AnnouncementController.delete_by_id(id)
 
-    if not announcement:
-        return {"message": "Announcement not found"}
-
-    await announcement.delete()
-    return {"message": "Announcement deleted"}
-
+# ── Lost & Found ─────────────────────────────────────────────────
 @router.post("/lost-found")
 async def create_lost_found(data: LostFoundSchema):
-    item = LostFound(**data.dict())
-    await item.insert()
-    return {"message": "Item posted"}
+    return await LostFoundController.create(data)
 
 @router.get("/lost-found")
 async def get_lost_found():
-    items = await LostFound.find_all().to_list()
-    return [serialize(i) for i in items]
+    return await LostFoundController.get_all()
 
 @router.put("/lost-found/{id}")
 async def update_lost_found(id: str, data: LostFoundSchema):
-    item = await LostFound.get(id)
-
-    if not item:
-        return {"message": "Item not found"}
-
-    for k, v in data.dict(exclude_unset=True).items():
-        setattr(item, k, v)
-
-    await item.save()
-    return {"message": "Item updated"}
+    return await LostFoundController.update(id, data)
 
 @router.delete("/lost-found/{id}")
 async def delete_lost_found(id: str):
-    item = await LostFound.get(id)
+    return await LostFoundController.delete_by_id(id)
 
-    if not item:
-        return {"message": "Item not found"}
-
-    await item.delete()
-    return {"message": "Item deleted"}
-
+# ── Fare ─────────────────────────────────────────────────────────
 @router.post("/fare")
 async def create_fare(data: FareSchema):
-    fare = Fare(**data.dict())
-    await fare.insert()
-    return {"message": "Fare created"}
+    return await FareController.create(data)
 
 @router.get("/fare")
 async def get_fare():
-    return await Fare.find_all().to_list()
+    return await FareController.get_all()
 
 @router.put("/fare/{id}")
 async def update_fare(id: str, data: FareSchema):
-    fare = await Fare.get(id)
-
-    if not fare:
-        return {"message": "Fare not found"}
-
-    for k, v in data.dict(exclude_unset=True).items():
-        setattr(fare, k, v)
-
-    await fare.save()
-    return {"message": "Fare updated"}
+    return await FareController.update(id, data)
 
 @router.delete("/fare/{id}")
 async def delete_fare(id: str):
-    fare = await Fare.get(id)
+    return await FareController.delete_by_id(id)
 
-    if not fare:
-        return {"message": "Fare not found"}
-
-    await fare.delete()
-    return {"message": "Fare deleted"}
-
+# ── Coding ───────────────────────────────────────────────────────
 @router.post("/coding")
 async def add_coding(data: CodingSchema):
-    coding = CodingSchedule(**data.dict())
-    await coding.insert()
-    return {"message": "Coding added"}
+    return await CodingController.create(data)
 
 @router.get("/coding")
 async def get_coding():
-    items = await CodingSchedule.find_all().to_list()
-    return [serialize(c) for c in items]
+    return await CodingController.get_all()
 
 @router.put("/coding/{id}")
 async def update_coding(id: str, data: CodingSchema):
-    coding = await CodingSchedule.get(id)
-
-    if not coding:
-        return {"message": "Coding not found"}
-
-    for k, v in data.dict(exclude_unset=True).items():
-        setattr(coding, k, v)
-
-    await coding.save()
-    return {"message": "Coding updated"}
+    return await CodingController.update(id, data)
 
 @router.delete("/coding/{id}")
 async def delete_coding(id: str):
-    coding = await CodingSchedule.get(id)
+    return await CodingController.delete_by_id(id)
 
-    if not coding:
-        return {"message": "Coding not found"}
-
-    await coding.delete()
-    return {"message": "Coding deleted"}
-
+# ── Officers ─────────────────────────────────────────────────────
 @router.post("/officers")
 async def create_officer(data: OfficerSchema):
-    officer = Officer(**data.dict())
-    await officer.insert()
-    return {"message": "Officer added"}
+    return await OfficerController.create(data)
 
 @router.get("/officers")
 async def get_officers():
-    officers = await Officer.find_all().to_list()
-    return [serialize(o) for o in officers]
+    return await OfficerController.get_all()
 
 @router.put("/officers/{id}")
 async def update_officer(id: str, data: OfficerSchema):
-    officer = await Officer.get(id)
-
-    if not officer:
-        return {"message": "Officer not found"}
-
-    for k, v in data.dict(exclude_unset=True).items():
-        setattr(officer, k, v)
-
-    await officer.save()
-    return {"message": "Officer updated"}
+    return await OfficerController.update(id, data)
 
 @router.delete("/officers/{id}")
 async def delete_officer(id: str):
-    officer = await Officer.get(id)
+    return await OfficerController.delete_by_id(id)
 
-    if not officer:
-        return {"message": "Officer not found"}
-
-    await officer.delete()
-    return {"message": "Officer removed"}
-
+# ── Violations ───────────────────────────────────────────────────
 @router.post("/violations")
 async def create_violation(data: ViolationSchema):
-    violation = Violation(**data.dict())
-    await violation.insert()
-    return {"message": "Violation recorded"}
+    return await ViolationController.create(data)
 
 @router.get("/violations")
 async def get_violations():
-    items = await Violation.find_all().to_list()
-    return [serialize(v) for v in items]
+    return await ViolationController.get_all()
 
 @router.get("/violations/{id}")
 async def get_violation(id: str):
-    item = await Violation.get(id)
-    if not item:
-        raise HTTPException(status_code=404, detail="Violation not found")
+    item = await ViolationController.get_or_404(id)
+    from Controllers.base_controller import serialize
     return serialize(item)
 
 @router.put("/violations/{id}")
 async def update_violation(id: str, data: ViolationSchema):
-    item = await Violation.get(id)
-    if not item:
-        return {"message": "Violation not found"}
-    for k, v in data.dict(exclude_unset=True).items():
-        setattr(item, k, v)
-    await item.save()
-    return {"message": "Violation updated"}
+    return await ViolationController.update(id, data)
 
 @router.delete("/violations/{id}")
 async def delete_violation(id: str):
-    item = await Violation.get(id)
-    if not item:
-        return {"message": "Violation not found"}
-    await item.delete()
-    return {"message": "Violation deleted"}
+    return await ViolationController.delete_by_id(id)

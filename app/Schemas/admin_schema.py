@@ -14,9 +14,9 @@ class AnnouncementSchema(BaseModel):
     author: str = "Admin"
     
 class OfficerSchema(BaseModel):
-    fname: str
+    full_name: str
     mi: Optional[str] = ""
-    lname: str
+    last_name: str
     role: str
     status: str
     phone: str
@@ -24,9 +24,9 @@ class OfficerSchema(BaseModel):
     custom_id: str
     
 class ContributionSchema(BaseModel):
-    fname: str
-    lname: str
-    body: str
+    full_name: str
+    last_name: str
+    body_number: str
     driverid: str
     amount: float
     period: str
@@ -35,7 +35,7 @@ class ContributionSchema(BaseModel):
     notes: Optional[str] = None
     
 class LostFoundSchema(BaseModel):
-    name: str
+    full_name: str
     body: str
     date: str         
     status: str = "Pending"
@@ -66,7 +66,7 @@ class ViolationSchema(BaseModel):
     penalty_amount: Optional[str] = None  
     
 class MemberRosterSchema(BaseModel):
-    name: str
+    full_name: str
     id: str
     status: str
     contrib: str
