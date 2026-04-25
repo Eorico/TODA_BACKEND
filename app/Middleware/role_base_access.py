@@ -2,6 +2,7 @@ from fastapi import Depends, HTTPException
 from jose import jwt, JWTError
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
+from datetime import datetime
 import os
 
 load_dotenv()
@@ -26,7 +27,11 @@ def verify_role(required_role: str):
                 SECRET_KEY,
                 algorithms=ALGORITHM
             )
-
+            
+            exp = payload.get("exp")
+            if not exp or datetime.utcfromtimestamp(exp) < datetime.utcnow():
+                raise HTTPException(status_code=401, detail="Token expired")
+                
             role = payload.get("role")
 
             if role != required_role:

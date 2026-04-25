@@ -10,11 +10,9 @@ class AuthService:
 
     @staticmethod
     async def signup(data, extra_data: dict) -> dict:
-        # 1. Duplicate Check
         if await User.find_one(User.email == data.email):
             raise HTTPException(400, "Email already registered")
 
-        # 2. Create Login User (Inactive by default for drivers)
         is_driver = data.role == "driver"
         user = User(
             full_name=data.full_name,
@@ -33,7 +31,6 @@ class AuthService:
             license_path = None
             if license_file:
                 license_path = await handle_file_upload(license_file, str(user.id))
-                print(f"✅ license_path length: {len(license_path) if license_path else 0}")
 
             name_parts = data.full_name.split(" ", 1)
             f_name = name_parts[0]
@@ -53,9 +50,7 @@ class AuthService:
             )
             try:
                 await profile.insert()
-                print(f"✅ RiderProfile created: {profile.id}")
             except Exception as e:
-                print(f"❌ RiderProfile insert failed: {e}")
                 raise HTTPException(500, f"Profile creation failed: {str(e)}")
 
         return {"message": "Registration successful. Drivers pending admin approval."}
@@ -91,8 +86,7 @@ class AuthService:
         if not user:
             raise HTTPException(status_code=404, detail="Email not found")
 
-        token = secrets.token_hex(16)
-        user.reset_token = token
+        token = secrets.token_hex(32)
         await user.save()
         return {"message": "Password reset token generated", "reset_token": token}
     

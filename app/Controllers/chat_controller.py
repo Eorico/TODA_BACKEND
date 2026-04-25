@@ -2,7 +2,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from Services.chat_service import ChatService
 
 class ChatManager:
-
+    # to be modified
     def __init__(self):
         self.active_connections: dict[str, list[WebSocket]] = {}
 

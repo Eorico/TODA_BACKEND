@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+slowapi
+starlette
+python-jose[cryptography]
+passlib[bcrypt]
+beanie
+motor
+pymongo
+python-dotenv
+python-multipart
+websockets

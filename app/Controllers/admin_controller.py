@@ -1,4 +1,4 @@
-from .base_controller import BaseController, serialize
+from .base_controller import BaseController
 from Models.announcement_model import Announcement
 from Models.officer_model import Officer
 from Models.riderprofile_model import RiderProfile
@@ -9,6 +9,7 @@ from Models.roster_model import MemberRoster
 from Models.contribution_or_butaw_model import Contribution_Or_Butaw
 from Models.violation_model import Violation
 from Models.user_model import User 
+from Utils.serializer import serialize
 from fastapi import HTTPException
 from datetime import datetime
 
@@ -38,7 +39,6 @@ class RiderController(BaseController):
     async def delete_by_id(cls, id: str) -> dict:         # ← override BaseController
         rider = await cls.get_or_404(id)
 
-        # Delete linked User account
         user = None
         if rider.user:
             try:
@@ -46,8 +46,7 @@ class RiderController(BaseController):
                 user = rider_fetched.user
             except Exception:
                 pass
-        
-        # Fallback: find by email if link fetch failed
+            
         if not user:
             user = await User.find_one(User.email == rider.email)
         
@@ -67,7 +66,6 @@ class RiderController(BaseController):
         if not rider:
             raise HTTPException(404, "Rider not found")
         
-        # ← was MemberRoster.id == rider.body (wrong field, wrong value)
         existing_member = await MemberRoster.find_one(
             MemberRoster.email == rider.email
         )
@@ -84,9 +82,7 @@ class RiderController(BaseController):
             )
             try:
                 await new_member.insert()
-                print(f"✅ MemberRoster created for {rider.email}")
             except Exception as e:
-                print(f"❌ MemberRoster insert failed: {e}")
                 raise HTTPException(500, f"Roster creation failed: {str(e)}")
 
         if rider.user:
