@@ -14,6 +14,7 @@ class RiderProfileService:
             user=user,
             address=data.address,
             license_url=data.license_url,
+            orcr_url=data.orcr_url,
             tricycle_body_number=data.body_number
         )
         await profile.insert()

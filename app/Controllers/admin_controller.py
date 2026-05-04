@@ -79,6 +79,7 @@ class RiderController(BaseController):
                 email=rider.email or "—",
                 contact=rider.contact or "—",
                 license_url=rider.license_url,  
+                orcr_url=rider.orcr_url, 
             )
             try:
                 await new_member.insert()

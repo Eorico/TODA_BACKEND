@@ -14,6 +14,8 @@ class RiderProfile(Document):
     email: Optional[str] = None  
         
     license_url: Optional[str] = None 
+    orcr_url: Optional[str] = None
+    
     address: Optional[str] = "Not Specified"
     user: Optional[Link[User]] = None
     member_status: str = "approved"

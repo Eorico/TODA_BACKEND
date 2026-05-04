@@ -71,3 +71,4 @@ class MemberRosterSchema(BaseModel):
     status: str
     contrib: str
     date: str
+    orcr_url: Optional[str] = None

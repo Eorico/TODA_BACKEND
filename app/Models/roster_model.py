@@ -12,6 +12,7 @@ class MemberRoster(Document):
     email: str = "—"
     contact: str = "—"
     license_url: Optional[str] = None
+    orcr_url: Optional[str] = None
     
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 

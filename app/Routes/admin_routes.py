@@ -67,6 +67,19 @@ async def upload_rider_license(request: Request, id: str, license: UploadFile = 
         "message": "License processed and stored in database successfully",
         "type": "base64"
     }
+    
+@router.post("/riders/{id}/orcr")
+@limiter.limit("10/minute")
+async def upload_rider_orcr(request: Request, id: str, orcr: UploadFile = File(...)):
+    content = await orcr.read()
+    base64_encoded = base64.b64encode(content).decode("utf-8")
+    orcr_url = f"data:{orcr.content_type};base64,{base64_encoded}"
+
+    rider = await RiderProfile.get(PydanticObjectId(id))
+    if not rider:
+        raise HTTPException(status_code=404, detail="Rider not found")
+    await rider.set({"orcr_url": orcr_url})
+    return {"message": "OR/CR stored successfully", "type": "base64"}
 
 @router.get("/riders")
 @limiter.limit("30/minute")

@@ -9,5 +9,6 @@ class RiderProfileCreateSchema(BaseModel):
     contact: str
     email: Optional[str] = None    
     license_url: Optional[str] = None
+    orcr_url: Optional[str] = None
     address: Optional[str] = "Not Specified"
     status: Optional[str] = "Active"

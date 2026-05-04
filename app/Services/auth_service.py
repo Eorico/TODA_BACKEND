@@ -26,11 +26,17 @@ class AuthService:
 
         if is_driver:
             license_file = extra_data.get("license_url")  
-            print(f"📎 license_file: {license_file}")       
+            orcr_file = extra_data.get("orcr_url")
+            print(f"📎 license_file: {license_file}")
+            print(f"📎 orcr_file: {orcr_file}")       
 
             license_path = None
             if license_file:
                 license_path = await handle_file_upload(license_file, str(user.id))
+                
+            orcr_path = None
+            if orcr_file:
+                orcr_path = await handle_file_upload(orcr_file, str(user.id))
 
             name_parts = data.full_name.split(" ", 1)
             f_name = name_parts[0]
@@ -43,6 +49,7 @@ class AuthService:
                 contact=extra_data.get("contact_number") or "-",
                 email=data.email,
                 license_url=license_path,
+                orcr_url=orcr_path,
                 address=extra_data.get("address") or "Not Specified",
                 status="Inactive",
                 member_status="pending",

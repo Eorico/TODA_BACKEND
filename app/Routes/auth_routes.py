@@ -20,7 +20,8 @@ async def signup(
     contact_number: Optional[str] = Form(None),
     address: Optional[str] = Form(None),
     body_number: Optional[str] = Form(None),
-    license_file: Optional[UploadFile] = File(None)
+    license_file: Optional[UploadFile] = File(None),
+    orcr_file: Optional[UploadFile] = File(None)
 ):
     # 3. Manually trigger Pydantic validation for the core fields
     try:
@@ -38,7 +39,8 @@ async def signup(
         "contact_number": contact_number,
         "address": address,
         "body_number": body_number,
-        "license_url": license_file
+        "license_url": license_file,
+        "orcr_url": orcr_file
     }
 
     return await AuthService.signup(signup_data, extra_data)

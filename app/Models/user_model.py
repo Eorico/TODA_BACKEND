@@ -21,6 +21,7 @@ class User(Document):
     body_number: Optional[str] = None
     
     license_url: Optional[str] = None
+    orcr_url: Optional[str] = None  
     
     is_active: bool = True
     reset_token: Optional[str] = None
