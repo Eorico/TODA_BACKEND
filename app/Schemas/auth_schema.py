@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, Field
-from typing import Literal
+from typing import Literal, Optional
 
 class SignUpSchema(BaseModel):
     full_name: str = Field(..., min_length=6, max_length=50)
@@ -10,6 +10,7 @@ class SignUpSchema(BaseModel):
 class LoginSchema(BaseModel):
     email: EmailStr
     password: str
+    role: Optional[Literal["driver", "passenger"]] = None
     
 class ForgotPasswordSchema(BaseModel):
     email: EmailStr

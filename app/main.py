@@ -1,7 +1,9 @@
-from Routes.auth_routes import router as auth_router
+from Routes.auth_driver_routes import router as auth_driver_router
+from Routes.auth_passenger_routes import router as auth_passenger_router
+from Routes.auth_shared_routes import router as auth_shared_routes
 from Routes.admin_routes import router as admin_router
 from Routes.admin_routes import public_router as admin_router_public
-from Routes.rider_routes import router as rider_router
+from Routes.driver_routes import router as rider_router
 from Routes.passenger_routes import router as passenger_router
 from Routes.comment_routes import router as comment_router
 from Routes.chat_routes import router as chat_router
@@ -46,13 +48,18 @@ os.makedirs("uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 #  Routers 
-app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
+app.include_router(auth_driver_router, prefix="/auth")
+app.include_router(auth_passenger_router, prefix="/auth")
+app.include_router(auth_shared_routes, prefix="/auth")
+
 app.include_router(admin_router, prefix="/admin")
-app.include_router(admin_router_public, prefix="/admin", tags=["Admin"])
-app.include_router(rider_router, prefix="/rider", tags=["Rider"])
-app.include_router(passenger_router, prefix="/passenger", tags=["Passenger"])
-app.include_router(comment_router, prefix="/comment", tags=["Comment"])
-app.include_router(chat_router, prefix="/chat", tags=["Chat"])
+app.include_router(admin_router_public, prefix="/admin")
+
+app.include_router(rider_router, prefix="/rider")
+app.include_router(passenger_router, prefix="/passenger")
+
+app.include_router(comment_router, prefix="/comment")
+app.include_router(chat_router, prefix="/chat")
 
 @app.on_event("startup")
 async def start_database():

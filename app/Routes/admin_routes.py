@@ -3,7 +3,7 @@ from slowapi import Limiter
 from Middleware.rate_limiter import limiter
 from Middleware.role_base_access import verify_role
 from Schemas.auth_schema import LoginSchema
-from Schemas.rider_schema import RiderProfileCreateSchema
+from Schemas.driver_schema import RiderProfileCreateSchema
 from Schemas.admin_schema import (
     AnnouncementSchema, LostFoundSchema, FareSchema,
     CodingSchema, OfficerSchema, ContributionSchema, MemberRosterSchema,
@@ -16,7 +16,7 @@ from Controllers.admin_controller import (
     CodingController, OfficerController, ViolationController
 )
 from beanie import PydanticObjectId
-from Models.riderprofile_model import RiderProfile
+from Models.driver_profile_model import RiderProfile
 import base64
 
 public_router = APIRouter(tags=["Admin"])

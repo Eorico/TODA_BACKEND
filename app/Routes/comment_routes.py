@@ -11,7 +11,7 @@ router = APIRouter(
 @router.post("/")
 async def comment_on_event(
     data: CommentCreateSchema,
-    user=Depends(verify_role("rider"))
+    user=Depends(verify_role("driver"))
 ):
     return await CommentController.create(user["user_id"], data)
 

@@ -4,7 +4,6 @@ from Middleware.role_base_access import verify_role
 from Controllers.passenger_controller import PassengerViewController
 
 router = APIRouter(
-    prefix="/passenger",
     tags=["Passenger"],
     dependencies=[Depends(verify_role("passenger"))]
 )

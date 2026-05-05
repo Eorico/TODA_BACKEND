@@ -1,5 +1,5 @@
-from Models.riderprofile_model import RiderProfile
-from Schemas.rider_schema import RiderProfileCreateSchema
+from Models.driver_profile_model import RiderProfile
+from Schemas.driver_schema import RiderProfileCreateSchema
 from fastapi import HTTPException
 
 class RiderProfileService:

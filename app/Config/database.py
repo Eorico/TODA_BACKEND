@@ -10,7 +10,7 @@ from Models.fare_matrix_model import Fare
 from Models.lostfound_model import LostFound
 from Models.message_model import Message
 from Models.officer_model import Officer
-from Models.riderprofile_model import RiderProfile
+from Models.driver_profile_model import RiderProfile
 from Models.roster_model import MemberRoster
 from Models.violation_model import Violation
 from dotenv import load_dotenv

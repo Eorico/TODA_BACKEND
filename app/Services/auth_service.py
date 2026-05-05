@@ -1,5 +1,5 @@
 from Models.user_model import User
-from Models.riderprofile_model import RiderProfile
+from Models.driver_profile_model import RiderProfile
 from Utils.password import hash_password, verify_password
 from Utils.jwt_handler import create_token
 from Utils.upload_license_img import handle_file_upload
@@ -69,6 +69,9 @@ class AuthService:
             raise HTTPException(status_code=404, detail="User not found")
         if not verify_password(data.password, user.password):
             raise HTTPException(status_code=401, detail="Invalid password")
+        
+        if hasattr(data, 'role') and data.role and user.role != data.role:
+            raise HTTPException(status_code=403, detail=f"This account is registered as a {user.role}.")
 
         if user.role == "driver":
             if not user.is_active:    

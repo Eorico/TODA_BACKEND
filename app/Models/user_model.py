@@ -6,7 +6,7 @@ from datetime import datetime
 """
     Roles Allowed: 
     admin
-    rider
+    driver
     passenger
 """
 
@@ -30,3 +30,8 @@ class User(Document):
     
     class Settings:
         name = "users"
+        use_revision = False
+        
+    def model_dump(self, **kwargs):
+        kwargs.setdefault("exclude_none", True)
+        return super().model_dump(**kwargs)

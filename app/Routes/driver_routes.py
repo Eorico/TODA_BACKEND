@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends
 from Middleware.role_base_access import verify_role
-from Schemas.rider_schema import RiderProfileCreateSchema
-from Controllers.rider_controller import RiderViewController
+from Schemas.driver_schema import RiderProfileCreateSchema
+from Controllers.driver_controller import RiderViewController
 
 router = APIRouter(
-    prefix="/rider",
     tags=["Rider"],
-    dependencies=[Depends(verify_role("rider"))]
+    dependencies=[Depends(verify_role("driver"))]
 )
 
 @router.get("/dashboard")
