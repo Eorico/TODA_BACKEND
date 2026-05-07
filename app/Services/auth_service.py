@@ -1,8 +1,8 @@
-from Models.user_model import User
-from Models.driver_profile_model import RiderProfile
-from Utils.password import hash_password, verify_password
-from Utils.jwt_handler import create_token
-from Utils.upload_license_img import handle_file_upload
+from app.Models.user_model import User
+from app.Models.driver_profile_model import RiderProfile
+from app.Utils.password import hash_password, verify_password
+from app.Utils.jwt_handler import create_token
+from app.Utils.upload_license_img import handle_file_upload
 from fastapi import HTTPException 
 import secrets 
 
@@ -78,12 +78,17 @@ class AuthService:
                 profile = await RiderProfile.find_one(RiderProfile.email == user.email)
                 status = profile.member_status if profile else "pending"
                 return {
-                    "access_token": None,
+                    # ✅ No access_token for inactive drivers — avoids storing "null"
                     "role": user.role,
                     "status": status  
                 }
 
-        token = create_token({"user_id": str(user.id), "role": user.role})
+        # ✅ Include email in token payload
+        token = create_token({
+            "user_id": str(user.id),
+            "role": user.role,
+            "email": user.email,   # ✅ added
+        })
         return {
             "access_token": token,
             "role": user.role,

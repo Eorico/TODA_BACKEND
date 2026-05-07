@@ -1,7 +1,7 @@
 # passenger_router.py
 from fastapi import APIRouter, Depends
-from Middleware.role_base_access import verify_role
-from Controllers.passenger_controller import PassengerViewController
+from app.Middleware.role_base_access import verify_role
+from app.Controllers.passenger_controller import PassengerViewController
 
 router = APIRouter(
     tags=["Passenger"],

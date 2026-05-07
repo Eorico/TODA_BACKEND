@@ -1,8 +1,8 @@
 # Routes/auth_passenger_routes.py
 from fastapi import APIRouter, Form, HTTPException, Request
-from Schemas.auth_schema import SignUpSchema, LoginSchema
-from Services.auth_service import AuthService
-from Middleware.rate_limiter import limiter
+from app.Schemas.auth_schema import SignUpSchema, LoginSchema
+from app.Services.auth_service import AuthService
+from app.Middleware.rate_limiter import limiter
 from typing import Optional
 
 router = APIRouter(prefix="/passenger", tags=["Auth - Passenger"])

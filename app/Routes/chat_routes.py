@@ -1,5 +1,5 @@
 from fastapi import APIRouter, WebSocket, Query
-from Controllers.chat_controller import chat_manager
+from app.Controllers.chat_controller import chat_manager
 from jose import jwt, JWTError
 import os
 

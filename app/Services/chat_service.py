@@ -1,6 +1,6 @@
-from Models.chat_model import Chatroom
-from Models.message_model import Message
-from Models.user_model import User
+from app.Models.chat_model import Chatroom
+from app.Models.message_model import Message
+from app.Models.user_model import User
 
 class ChatService:
 

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
-from Schemas.admin_schema import CommentCreateSchema
-from Controllers.comment_controller import CommentController
-from Middleware.role_base_access import verify_role
+from app.Schemas.admin_schema import CommentCreateSchema
+from app.Controllers.comment_controller import CommentController
+from app.Middleware.role_base_access import verify_role
 
 router = APIRouter(
     prefix="/comment",

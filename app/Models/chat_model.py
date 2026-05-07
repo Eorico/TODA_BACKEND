@@ -1,6 +1,6 @@
 from beanie import Document, Link
 from datetime import datetime
-from Models.user_model import User
+from app.Models.user_model import User
 
 class Chatroom(Document):
     

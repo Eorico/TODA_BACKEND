@@ -1,6 +1,6 @@
-from Models.comment_models import Comment
-from Models.announcement_model import Announcement
-from Models.user_model import User
+from app.Models.comment_models import Comment
+from app.Models.announcement_model import Announcement
+from app.Models.user_model import User
 from fastapi import HTTPException
 
 class CommentService:

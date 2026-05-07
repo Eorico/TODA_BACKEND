@@ -1,15 +1,15 @@
-from Routes.auth_driver_routes import router as auth_driver_router
-from Routes.auth_passenger_routes import router as auth_passenger_router
-from Routes.auth_shared_routes import router as auth_shared_routes
-from Routes.admin_routes import router as admin_router
-from Routes.admin_routes import public_router as admin_router_public
-from Routes.driver_routes import router as rider_router
-from Routes.passenger_routes import router as passenger_router
-from Routes.comment_routes import router as comment_router
-from Routes.chat_routes import router as chat_router
-from Config.database import init_database
-from Middleware.rate_limiter import limiter
-from Middleware.security_headers import SecurityHeadersMiddleware
+from app.Routes.auth_driver_routes import router as auth_driver_router
+from app.Routes.auth_passenger_routes import router as auth_passenger_router
+from app.Routes.auth_shared_routes import router as auth_shared_routes
+from app.Routes.admin_routes import router as admin_router
+from app.Routes.admin_routes import public_router as admin_router_public
+from app.Routes.driver_routes import router as rider_router
+from app.Routes.passenger_routes import router as passenger_router
+from app.Routes.comment_routes import router as comment_router
+from app.Routes.chat_routes import router as chat_router
+from app.Config.database import init_database
+from app.Middleware.rate_limiter import limiter
+from app.Middleware.security_headers import SecurityHeadersMiddleware
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -55,7 +55,7 @@ app.include_router(auth_shared_routes, prefix="/auth")
 app.include_router(admin_router, prefix="/admin")
 app.include_router(admin_router_public, prefix="/admin")
 
-app.include_router(rider_router, prefix="/rider")
+app.include_router(rider_router, prefix="/driver")
 app.include_router(passenger_router, prefix="/passenger")
 
 app.include_router(comment_router, prefix="/comment")

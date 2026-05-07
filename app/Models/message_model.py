@@ -1,7 +1,7 @@
 from beanie import Document, Link 
 from datetime import datetime
-from Models.user_model import User
-from Models.chat_model import Chatroom
+from app.Models.user_model import User
+from app.Models.chat_model import Chatroom
 
 
 class Message(Document):

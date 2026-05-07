@@ -1,7 +1,6 @@
-from beanie import Document, Link
+from beanie import Document
 from datetime import datetime, timezone
 from typing import Optional
-from Models.user_model import User
 from pydantic import Field
 
 class RiderProfile(Document):
@@ -17,7 +16,7 @@ class RiderProfile(Document):
     orcr_url: Optional[str] = None
     
     address: Optional[str] = "Not Specified"
-    user: Optional[Link[User]] = None
+ 
     member_status: str = "approved"
     last_contribution: float = 0.0
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

@@ -1,22 +1,22 @@
 from fastapi import APIRouter, Depends, Body, HTTPException, File, UploadFile, Request
 from slowapi import Limiter
-from Middleware.rate_limiter import limiter
-from Middleware.role_base_access import verify_role
-from Schemas.auth_schema import LoginSchema
-from Schemas.driver_schema import RiderProfileCreateSchema
-from Schemas.admin_schema import (
+from app.Middleware.rate_limiter import limiter
+from app.Middleware.role_base_access import verify_role
+from app.Schemas.auth_schema import LoginSchema
+from app.Schemas.driver_schema import RiderProfileCreateSchema
+from app.Schemas.admin_schema import (
     AnnouncementSchema, LostFoundSchema, FareSchema,
     CodingSchema, OfficerSchema, ContributionSchema, MemberRosterSchema,
     ViolationSchema
 )
-from Services.auth_service import AuthService
-from Controllers.admin_controller import (
+from app.Services.auth_service import AuthService
+from app.Controllers.admin_controller import (
     RiderController, RosterController, ContributionController,
     AnnouncementController, LostFoundController, FareController,
     CodingController, OfficerController, ViolationController
 )
 from beanie import PydanticObjectId
-from Models.driver_profile_model import RiderProfile
+from app.Models.driver_profile_model import RiderProfile
 import base64
 
 public_router = APIRouter(tags=["Admin"])

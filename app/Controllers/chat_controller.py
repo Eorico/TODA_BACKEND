@@ -1,5 +1,5 @@
 from fastapi import WebSocket, WebSocketDisconnect
-from Services.chat_service import ChatService
+from app.Services.chat_service import ChatService
 
 class ChatManager:
     # to be modified

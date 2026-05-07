@@ -1,7 +1,7 @@
 from beanie import Document, Link
 from datetime import datetime
-from Models.user_model import User
-from Models.announcement_model import Announcement
+from app.Models.user_model import User
+from app.Models.announcement_model import Announcement
 
 class Comment(Document):
     user: Link[User]

@@ -1,4 +1,4 @@
-from Services.comment_service import CommentService
+from app.Services.comment_service import CommentService
 
 class CommentController:
 

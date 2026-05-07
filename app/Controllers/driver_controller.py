@@ -1,6 +1,6 @@
-from Models.lostfound_model import LostFound
-from Models.announcement_model import Announcement
-from Services.rider_profile_service import RiderProfileService
+from app.Models.lostfound_model import LostFound
+from app.Models.announcement_model import Announcement
+from app.Services.rider_profile_service import RiderProfileService
 
 class RiderViewController:
 
@@ -13,7 +13,7 @@ class RiderViewController:
         return await RiderProfileService.create(user, data)
 
     @staticmethod
-    async def view_profile(user):
+    async def view_profile(user: dict):
         return await RiderProfileService.get_profile(user)
 
     @staticmethod

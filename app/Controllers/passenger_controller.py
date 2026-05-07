@@ -1,6 +1,6 @@
 # Controllers/passenger_controller.py
-from Models.announcement_model import Announcement
-from Models.lostfound_model import LostFound
+from app.Models.announcement_model import Announcement
+from app.Models.lostfound_model import LostFound
 
 class PassengerViewController:
 

@@ -1,5 +1,5 @@
 from fastapi import HTTPException
-from Utils.serializer import serialize
+from app.Utils.serializer import serialize
 
 class BaseController:
     model = None

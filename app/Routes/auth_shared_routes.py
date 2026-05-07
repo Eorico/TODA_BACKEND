@@ -1,8 +1,8 @@
 # Routes/auth_shared_routes.py
 from fastapi import APIRouter, Request
-from Schemas.auth_schema import ForgotPasswordSchema, VerifyCodeSchema, ResetPasswordSchema
-from Services.auth_service import AuthService
-from Middleware.rate_limiter import limiter
+from app.Schemas.auth_schema import ForgotPasswordSchema, VerifyCodeSchema, ResetPasswordSchema
+from app.Services.auth_service import AuthService
+from app.Middleware.rate_limiter import limiter
 
 router = APIRouter(tags=["Auth - Shared"])
 

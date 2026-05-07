@@ -1,3 +1,4 @@
+# Middleware/role_base_access.py
 from fastapi import Depends, HTTPException
 from jose import jwt, JWTError
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -22,22 +23,22 @@ def verify_role(required_role: str):
             if not token:
                 raise HTTPException(status_code=401, detail="Missing token")
 
-            payload = jwt.decode(
-                token,
-                SECRET_KEY,
-                algorithms=ALGORITHM
-            )
+            payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
             
             exp = payload.get("exp")
             if not exp or datetime.utcfromtimestamp(exp) < datetime.utcnow():
                 raise HTTPException(status_code=401, detail="Token expired")
                 
             role = payload.get("role")
-
             if role != required_role:
                 raise HTTPException(status_code=403, detail="Access denied")
 
-            return payload
+            # ✅ Normalize: always expose "id" regardless of what key was used in the token
+            return {
+                 "id": payload.get("user_id") or payload.get("id"),
+                "role": role,
+                "email": payload.get("email"),
+            }
 
         except JWTError:
             raise HTTPException(status_code=401, detail="Invalid or expired token")
