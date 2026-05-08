@@ -20,7 +20,8 @@ class AuthService:
             password=hash_password(data.password),
             role=data.role,
             contact_number=extra_data.get("contact_number"),
-            is_active=not is_driver
+            is_active=not is_driver,
+            body_number=extra_data.get("body_number"),
         )
         await user.insert()
 
@@ -74,20 +75,28 @@ class AuthService:
             raise HTTPException(status_code=403, detail=f"This account is registered as a {user.role}.")
 
         if user.role == "driver":
+            body_number = getattr(data, 'body_number', None)
+            if not body_number or not body_number.strip(): 
+                raise HTTPException(status_code=400, detail="Body number is required.")
+            if user.body_number != body_number.strip():
+                raise HTTPException(status_code=401, detail="Body number is incorrect.")
+
+        if user.role == "driver":
             if not user.is_active:    
-                profile = await RiderProfile.find_one(RiderProfile.email == user.email)
+                profile = await RiderProfile.find_one(
+                    RiderProfile.email == user.email,
+                    fetch_links=False
+                )
                 status = profile.member_status if profile else "pending"
                 return {
-                    # ✅ No access_token for inactive drivers — avoids storing "null"
                     "role": user.role,
                     "status": status  
                 }
 
-        # ✅ Include email in token payload
         token = create_token({
             "user_id": str(user.id),
             "role": user.role,
-            "email": user.email,   # ✅ added
+            "email": user.email,
         })
         return {
             "access_token": token,

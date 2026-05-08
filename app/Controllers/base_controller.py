@@ -6,7 +6,7 @@ class BaseController:
     
     @classmethod
     async def get_or_404(cls, id: str):
-        item = await cls.model.get(id)
+        item = await cls.model.get(id, fetch_links=False)
         if not item:
             raise HTTPException(status_code=404, detail=f"{cls.model.__name__} not found")
         return item

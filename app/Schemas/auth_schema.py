@@ -11,6 +11,7 @@ class LoginSchema(BaseModel):
     email: EmailStr
     password: str
     role: Optional[Literal["driver", "passenger"]] = None
+    body_number: Optional[str] = None 
     
 class ForgotPasswordSchema(BaseModel):
     email: EmailStr

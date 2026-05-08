@@ -36,20 +36,11 @@ class RiderController(BaseController):
         return {"message": "Rider Updated"}
 
     @classmethod
-    async def delete_by_id(cls, id: str) -> dict:         # ← override BaseController
+    async def delete_by_id(cls, id: str) -> dict:
         rider = await cls.get_or_404(id)
 
-        user = None
-        if rider.user:
-            try:
-                rider_fetched = await RiderProfile.get(id, fetch_links=True)
-                user = rider_fetched.user
-            except Exception:
-                pass
-            
-        if not user:
-            user = await User.find_one(User.email == rider.email)
-        
+        # ✅ Look up User by email directly — no more rider.user
+        user = await User.find_one(User.email == rider.email)
         if user:
             await user.delete()
             
@@ -62,7 +53,8 @@ class RiderController(BaseController):
 
     @classmethod
     async def approve(cls, id: str) -> dict:
-        rider = await RiderProfile.get(id, fetch_links=True)
+        # ✅ fetch_links=False — no Link[User] field anymore
+        rider = await RiderProfile.get(id, fetch_links=False)
         if not rider:
             raise HTTPException(404, "Rider not found")
         
@@ -86,21 +78,18 @@ class RiderController(BaseController):
             except Exception as e:
                 raise HTTPException(500, f"Roster creation failed: {str(e)}")
 
-        if rider.user:
-            user = rider.user
+        # ✅ Always look up User by email — no more rider.user
+        user = await User.find_one(User.email == rider.email)
+        if user:
             user.is_active = True
             await user.save()
-        else:
-            user = await User.find_one(User.email == rider.email)
-            if user:
-                user.is_active = True
-                await user.save()
 
         rider.member_status = "approved"
         rider.status = "Active"
         await rider.save()
 
         return {"message": "Rider Approved, Roster synced, and Mobile Login enabled!"}
+
 
     @classmethod
     async def reject(cls, id: str) -> dict:
