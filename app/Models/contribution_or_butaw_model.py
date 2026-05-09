@@ -3,9 +3,9 @@ from typing import Optional
 
 class Contribution_Or_Butaw(Document):
 
-    fname: str
-    lname: str
-    body: str
+    full_name: str
+    last_name: str
+    body_number: str
     driverid: str
     amount: float
     period: str

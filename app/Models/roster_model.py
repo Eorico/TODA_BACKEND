@@ -13,7 +13,7 @@ class MemberRoster(Document):
     contact: str = "—"
     license_url: Optional[str] = None
     orcr_url: Optional[str] = None
-    
+    violation_count: int = 0 
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     class Settings:

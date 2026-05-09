@@ -35,7 +35,7 @@ class ContributionSchema(BaseModel):
     notes: Optional[str] = None
     
 class LostFoundSchema(BaseModel):
-    full_name: str
+    name: str
     body: str
     date: str         
     status: str = "Pending"
@@ -67,8 +67,11 @@ class ViolationSchema(BaseModel):
     
 class MemberRosterSchema(BaseModel):
     full_name: str
-    id: str
+    body_number: Optional[str] = "—"
     status: str
     contrib: str
     date: str
+    email: Optional[str] = "—"
+    contact: Optional[str] = "—"
+    license_url: Optional[str] = None
     orcr_url: Optional[str] = None
