@@ -5,6 +5,7 @@ from app.Models.passenger_profile_model import PassengerProfile
 from app.Models.officer_model import Officer
 from app.Models.fare_matrix_model import Fare
 from app.Models.coding_model import CodingSchedule
+from app.Models.user_model import User
 from app.Utils.serializer import serialize
 from fastapi import HTTPException
 
@@ -50,13 +51,12 @@ class PassengerViewController:
             fetch_links=False
         )
         if not profile:
-            # Pull full_name from the User model instead
-            from app.Models.user_model import User
             db_user = await User.find_one(User.email == email, fetch_links=False)
             profile = PassengerProfile(
                 full_name=db_user.full_name if db_user else email.split('@')[0],
                 contact=db_user.contact_number if db_user else None,
                 email=email,
+                address=db_user.address if db_user else None,   
             )
             await profile.insert()
 

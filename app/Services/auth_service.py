@@ -1,6 +1,5 @@
 from app.Models.user_model import User
 from app.Models.driver_profile_model import RiderProfile
-from app.Models.passenger_profile_model import PassengerProfile  # ← ADD THIS IMPORT
 from app.Utils.password import hash_password, verify_password
 from app.Utils.jwt_handler import create_token
 from app.Utils.upload_license_img import handle_file_upload
@@ -23,12 +22,15 @@ class AuthService:
             contact_number=extra_data.get("contact_number"),
             is_active=not is_driver,
             body_number=extra_data.get("body_number"),
+            address=extra_data.get("address")
         )
         await user.insert()
 
         if is_driver:
             license_file = extra_data.get("license_url")  
             orcr_file = extra_data.get("orcr_url")
+            print(f"📎 license_file: {license_file}")
+            print(f"📎 orcr_file: {orcr_file}")       
 
             license_path = None
             if license_file:
@@ -62,17 +64,74 @@ class AuthService:
             except Exception as e:
                 raise HTTPException(500, f"Profile creation failed: {str(e)}")
 
-        else:
-            # ── CREATE PASSENGER PROFILE ── ← ADD THIS ENTIRE BLOCK
-            passenger_profile = PassengerProfile(
-                full_name=data.full_name,
-                email=data.email,
-                contact=extra_data.get("contact_number"),
-                address=extra_data.get("address") or "Not Specified",
-            )
-            try:
-                await passenger_profile.insert()
-            except Exception as e:
-                raise HTTPException(500, f"Passenger profile creation failed: {str(e)}")
-
         return {"message": "Registration successful. Drivers pending admin approval."}
+
+    @staticmethod
+    async def login(data) -> dict:
+        user = await User.find_one(User.email == data.email)
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        if not verify_password(data.password, user.password):
+            raise HTTPException(status_code=401, detail="Invalid password")
+        
+        if hasattr(data, 'role') and data.role and user.role != data.role:
+            raise HTTPException(status_code=403, detail=f"This account is registered as a {user.role}.")
+
+        if user.role == "driver":
+            body_number = getattr(data, 'body_number', None)
+            if not body_number or not body_number.strip(): 
+                raise HTTPException(status_code=400, detail="Body number is required.")
+            if user.body_number != body_number.strip():
+                raise HTTPException(status_code=401, detail="Body number is incorrect.")
+
+        if user.role == "driver":
+            if not user.is_active:    
+                profile = await RiderProfile.find_one(
+                    RiderProfile.email == user.email,
+                    fetch_links=False
+                )
+                status = profile.member_status if profile else "pending"
+                return {
+                    "role": user.role,
+                    "status": status  
+                }
+
+        token = create_token({
+            "user_id": str(user.id),
+            "role": user.role,
+            "email": user.email,
+        })
+        return {
+            "access_token": token,
+            "role": user.role,
+            "status": "approved"   
+        }
+
+    @staticmethod
+    async def forgot_password(data) -> dict:
+        user = await User.find_one(User.email == data.email)
+        if not user:
+            raise HTTPException(status_code=404, detail="Email not found")
+
+        token = secrets.token_hex(32)
+        await user.save()
+        return {"message": "Password reset token generated", "reset_token": token}
+    
+    @staticmethod
+    async def verify_code(data) -> dict:
+        user = await User.find_one(User.email == data.email)
+        if not user or user.reset_token != data.code:
+            raise HTTPException(status_code=400, detail="Invalid or Expired code")
+        
+        return {"message": "Code verified successfully"}
+    
+    @staticmethod
+    async def reset_password(data) -> dict:
+        user = await User.find_one(User.email == data.email)
+        if not user or user.reset_token != data.code:
+            raise HTTPException(status_code=400, detail="Invalid Session")
+        
+        user.password = hash_password(data.new_password)
+        user.reset_token = None
+        await user.save()
+        return {"message": "Password reset successfully"}
