@@ -17,6 +17,8 @@ async def signup(
     contact_number: Optional[str] = Form(None),
     address: Optional[str] = Form(None),
     body_number: Optional[str] = Form(None),
+    expiration_date_license: Optional[str] = Form(None),    
+    expiration_date_orcr: Optional[str] = Form(None),     
     license_file: Optional[UploadFile] = File(None),
     orcr_file: Optional[UploadFile] = File(None),
 ):
@@ -34,6 +36,8 @@ async def signup(
         "contact_number": contact_number,
         "address": address,
         "body_number": body_number,
+        "expiration_date_license": expiration_date_license,   
+        "expiration_date_orcr": expiration_date_orcr,  
         "license_url": license_file,
         "orcr_url": orcr_file,
     }

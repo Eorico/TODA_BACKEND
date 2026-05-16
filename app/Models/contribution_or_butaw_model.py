@@ -8,7 +8,6 @@ class Contribution_Or_Butaw(Document):
     body_number: str
     driverid: str
     amount: float
-    period: str
     date: str
     status: str  # paid, partial, or unpaid
     notes: Optional[str] = None

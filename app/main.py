@@ -3,8 +3,9 @@ from app.Routes.auth_passenger_routes import router as auth_passenger_router
 from app.Routes.auth_shared_routes import router as auth_shared_routes
 from app.Routes.admin_routes import router as admin_router
 from app.Routes.admin_routes import public_router as admin_router_public
-from app.Routes.driver_routes import router as rider_router
+from app.Routes.driver_routes import router as driver_router
 from app.Routes.passenger_routes import router as passenger_router
+from app.Routes.passenger_routes import public_router as passenger_public_router 
 from app.Routes.comment_routes import router as comment_router
 from app.Routes.chat_routes import router as chat_router
 from app.Config.database import init_database
@@ -55,8 +56,9 @@ app.include_router(auth_shared_routes, prefix="/auth")
 app.include_router(admin_router, prefix="/admin")
 app.include_router(admin_router_public, prefix="/admin")
 
-app.include_router(rider_router, prefix="/driver")
+app.include_router(driver_router, prefix="/driver")
 app.include_router(passenger_router, prefix="/passenger")
+app.include_router(passenger_public_router, prefix="/passenger") 
 
 app.include_router(comment_router, prefix="/comment")
 app.include_router(chat_router, prefix="/chat")

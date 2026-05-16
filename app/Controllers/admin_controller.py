@@ -17,6 +17,11 @@ class RiderController(BaseController):
     model = RiderProfile
     
     @classmethod
+    async def get_all(cls) -> list:
+        items = await RiderProfile.find_all().to_list()
+        return [serialize(i) for i in items] 
+    
+    @classmethod
     async def create(cls, data) -> dict:
         rider = RiderProfile(**data.dict())
         await rider.insert()
@@ -72,6 +77,8 @@ class RiderController(BaseController):
                 contact=rider.contact or "—",
                 license_url=rider.license_url,  
                 orcr_url=rider.orcr_url, 
+                expiration_date_license=rider.expiration_date_license,   
+                expiration_date_orcr=rider.expiration_date_orcr,
             )
             try:
                 await new_member.insert()
@@ -125,19 +132,24 @@ class RosterController(BaseController):
 
 class ContributionController(BaseController):
     model = Contribution_Or_Butaw
-    
+
+    @classmethod
+    async def get_all(cls) -> list:
+        items = await Contribution_Or_Butaw.find_all().to_list()
+        return [serialize(i) for i in items]        # ← was missing, uses your existing serializer
+
     @classmethod
     async def create(cls, data) -> dict:
-        await Contribution_Or_Butaw(**data.dict()).insert()  
+        await Contribution_Or_Butaw(**data.dict()).insert()
         return {"message": "Contribution recorded successfully"}
-    
+
     @classmethod
     async def update(cls, id: str, data) -> dict:
         record = await cls.get_or_404(id)
-        for k, v, in data.dict(exclude_unset=True).items():
+        for k, v in data.dict(exclude_unset=True).items():
             setattr(record, k, v)
         await record.save()
-        return {"message": "Record Update"}
+        return {"message": "Record Updated"}
     
 class AnnouncementController(BaseController):
     model = Announcement
@@ -174,6 +186,11 @@ class LostFoundController(BaseController):
 
 class FareController(BaseController):
     model = Fare
+    
+    @classmethod
+    async def get_all(cls) -> list:
+        items = await Fare.find_all().to_list()
+        return [serialize(i) for i in items]
 
     @classmethod
     async def create(cls, data) -> dict:
@@ -191,6 +208,11 @@ class FareController(BaseController):
 
 class CodingController(BaseController):
     model = CodingSchedule
+    
+    @classmethod
+    async def get_all(cls) -> list:
+        items = await CodingSchedule.find_all().to_list()
+        return [serialize(i) for i in items] 
 
     @classmethod
     async def create(cls, data) -> dict:
@@ -208,6 +230,11 @@ class CodingController(BaseController):
 
 class OfficerController(BaseController):
     model = Officer
+    
+    @classmethod
+    async def get_all(cls) -> list:
+        items = await Officer.find_all().to_list()
+        return [serialize(i) for i in items] 
 
     @classmethod
     async def create(cls, data) -> dict:

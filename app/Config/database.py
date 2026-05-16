@@ -13,6 +13,7 @@ from app.Models.officer_model import Officer
 from app.Models.driver_profile_model import RiderProfile
 from app.Models.roster_model import MemberRoster
 from app.Models.violation_model import Violation
+from app.Models.passenger_profile_model import PassengerProfile
 from dotenv import load_dotenv
 import os
 
@@ -38,6 +39,7 @@ async def init_database():
             Officer,
             RiderProfile,
             MemberRoster,
-            Violation
+            Violation,
+            PassengerProfile,
         ]
     )

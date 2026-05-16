@@ -14,7 +14,8 @@ async def signup(
     full_name: str = Form(...),
     email: str = Form(...),
     password: str = Form(...),
-    contact_number: Optional[str] = Form(None)
+    contact_number: Optional[str] = Form(None),
+    address: Optional[str] = Form(None)
 ):
     try:
         signup_data = SignUpSchema(
@@ -27,7 +28,8 @@ async def signup(
         raise HTTPException(status_code=422, detail=str(e))
 
     return await AuthService.signup(signup_data, extra_data={
-        "contact_number": contact_number
+        "contact_number": contact_number,
+        "address": address
     })
 
 

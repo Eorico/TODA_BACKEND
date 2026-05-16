@@ -1,2 +1,0 @@
-class PassengerProfile():
-    pass

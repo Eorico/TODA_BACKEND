@@ -11,6 +11,9 @@ class RiderProfile(Document):
     status: str = "Active"
     
     email: Optional[str] = None  
+    
+    expiration_date_license: Optional [str] = None
+    expiration_date_orcr: Optional [str] = None
         
     license_url: Optional[str] = None 
     orcr_url: Optional[str] = None

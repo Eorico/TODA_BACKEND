@@ -1,8 +1,11 @@
 from app.Models.driver_profile_model import RiderProfile
 from app.Schemas.driver_schema import RiderProfileCreateSchema
+from app.Models.contribution_or_butaw_model import Contribution_Or_Butaw
 from fastapi import HTTPException
+ 
 
-class RiderProfileService:
+
+class RiderService:
 
     @staticmethod
     async def get_profile(user: dict):
@@ -12,12 +15,10 @@ class RiderProfileService:
                 status_code=401,
                 detail="Token missing email. Please log out and log in again."
             )
-
         profile = await RiderProfile.find_one(
             RiderProfile.email == email,
             fetch_links=False
         )
-
         if not profile:
             raise HTTPException(status_code=404, detail="Profile not found")
 
@@ -33,6 +34,8 @@ class RiderProfileService:
             "member_status": profile.member_status,
             "license_url": profile.license_url,
             "orcr_url": profile.orcr_url,
+            "expiration_date_license": profile.expiration_date_license,
+            "expiration_date_orcr": profile.expiration_date_orcr,
             "last_contribution": profile.last_contribution,
             "created_at": profile.created_at.isoformat(),
         }
@@ -75,6 +78,36 @@ class RiderProfileService:
         )
         if not profile:
             raise HTTPException(status_code=404, detail="Profile not found")
+
+        profile_id = str(profile.id)
+
+        # Primary match: by driverid (admin sets this from the rider dropdown)
+        # Fallback: by body_number in case driverid was stored differently
+        contributions = await Contribution_Or_Butaw.find(
+            Contribution_Or_Butaw.driverid == profile_id
+        ).sort("-date").to_list()
+
+        # Fallback: match by body_number if driverid query returned nothing
+        if not contributions and profile.body_number and profile.body_number != "---":
+            contributions = await Contribution_Or_Butaw.find(
+                Contribution_Or_Butaw.body_number == profile.body_number
+            ).sort("-date").to_list()
+
+        total = sum(c.amount for c in contributions)
+
         return {
-            "last_contribution": profile.last_contribution,
+            "total_amount": total,
+            "contributions": [
+                {
+                    "id":          str(c.id),
+                    "full_name":   c.full_name,
+                    "last_name":   c.last_name,
+                    "body_number": c.body_number,
+                    "amount":      c.amount,
+                    "date":        c.date,
+                    "status":      c.status,
+                    "notes":       c.notes,
+                }
+                for c in contributions
+            ],
         }

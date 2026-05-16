@@ -29,7 +29,6 @@ class ContributionSchema(BaseModel):
     body_number: str
     driverid: str
     amount: float
-    period: str
     date: str
     status: str
     notes: Optional[str] = None
@@ -75,3 +74,5 @@ class MemberRosterSchema(BaseModel):
     contact: Optional[str] = "—"
     license_url: Optional[str] = None
     orcr_url: Optional[str] = None
+    expiration_date_license: Optional[str] = None  
+    expiration_date_orcr: Optional[str] = None 
