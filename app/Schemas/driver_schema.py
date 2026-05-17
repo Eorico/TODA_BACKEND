@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional 
 from pydantic import BaseModel
 
-class RiderProfileCreateSchema(BaseModel):
+class DriverProfileCreateSchema(BaseModel):
     full_name: str
     last_name: str = ""
     body_number: str = "---"

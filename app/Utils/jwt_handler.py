@@ -1,18 +1,27 @@
-from jose import jwt
-from datetime import datetime, timedelta
+# app/Utils/JwtHandler.py
+from jose import jwt, JWTError
+from datetime import datetime, timedelta, timezone
+from app.Exceptions.app_exception import UnauthorizedException
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
 
-SECRET_KEY = os.getenv("SECRET_KEY")
-ALGORITHM = "HS256"
+class JwtHandler:
+    """Single Responsibility: JWT encoding/decoding only."""
+    _secret    = os.getenv("SECRET_KEY", "fallback-dev-secret")
+    _algorithm = "HS256"
+    _ttl_hours = 24
 
-def create_token(data: dict):
-    to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(hours=2)
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)  
+    @classmethod
+    def encode(cls, payload: dict) -> str:
+        data = payload.copy()
+        data["exp"] = datetime.now(timezone.utc) + timedelta(hours=cls._ttl_hours)
+        return jwt.encode(data, cls._secret, algorithm=cls._algorithm)
 
-def verify_token(token: str) -> dict:
-    return jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])    
+    @classmethod
+    def decode(cls, token: str) -> dict:
+        try:
+            return jwt.decode(token, cls._secret, algorithms=[cls._algorithm])
+        except JWTError:
+            raise UnauthorizedException("Token is invalid or expired.")

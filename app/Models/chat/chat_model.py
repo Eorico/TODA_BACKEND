@@ -1,0 +1,12 @@
+from beanie import Document, Link
+from datetime import datetime
+from app.Models.users.user_model import User
+
+class Chatroom(Document):
+    
+    rider: Link[User]
+    passenger: Link[User]
+    created_at: datetime = datetime .utcnow()
+
+    class Settings: 
+        name = "chat_rooms"
